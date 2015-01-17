@@ -3,7 +3,7 @@
 # Converts all of the files in a .info.xml file into plain marked up documents
 # and puts them in a markup/ folder.
 #
-# runmarkup.sh <filepath>
+# runmarkup.sh <filepath> <markup-out-dir>
 #
 
 # Having extra space at the end of the string seems to make maven angry.

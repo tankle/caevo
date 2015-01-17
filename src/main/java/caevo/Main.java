@@ -614,6 +614,7 @@ public class Main {
 		if( Directory.isDirectory(path) ) {
 			for( String file : Directory.getFilesSorted(path) ) {
 				String subpath = path + File.separator + file;
+                                System.out.println("processing file name is " + file);
 				try {
 					SieveDocument doc = Tempeval3Parser.rawXMLtoSieveDocument(subpath, parser, gsf);
 					docs.addDocument(doc);

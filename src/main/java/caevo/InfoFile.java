@@ -746,7 +746,7 @@ public class InfoFile {
           strings.add("<MAKEINSTANCE eventID=\"" + event.getId() + 
               "\" eiid=\"" + eiid + 
               "\" tense=\"" + event.getTense() + 
-              "\" aspect=\"" + event.getAspect() + 
+              "\" pos=\"VERB\" aspect=\"" + event.getAspect() + 
               ( event.getPolarity() != null ? ("\" polarity=\"" + event.getPolarity()) : "") + 
           "\" />");
         }
@@ -808,7 +808,7 @@ public class InfoFile {
   				TextEvent event = indexToEvents.get(ii);
   				String eventid = event.getId();
   				if( numericIDOnly && eventid.startsWith("e") ) eventid = eventid.substring(1);
-  				buf.append("<" + eventElemName);
+  				buf.append("<EVENT");
   				buf.append(" " + idAttributeString + "=\"" + eventid + "\"");
   				if( showTense )
   					buf.append(" tense=\"" + event.getTense() + "\"");
@@ -827,7 +827,7 @@ public class InfoFile {
 //  			System.out.println("\tnow=" + str);
   			buf.append(str);
   				
-  			if( endevent ) buf.append("</" + eventElemName + ">");
+  			if( endevent ) buf.append("</EVENT>");
   			if( endTimexes.contains(ii) ) buf.append("</TIMEX3>");
   			
   			buf.append(token.getString(CoreAnnotations.AfterAnnotation.class));

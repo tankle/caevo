@@ -2,6 +2,7 @@ package caevo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.IOException;
 import java.util.Properties;
 
 import edu.stanford.nlp.ling.CoreAnnotations;
@@ -15,8 +16,10 @@ import edu.stanford.nlp.time.Options.RelativeHeuristicLevel;
 import edu.stanford.nlp.time.SUTimeMain;
 import edu.stanford.nlp.time.TimeAnnotations;
 import edu.stanford.nlp.time.TimeAnnotator;
+import edu.stanford.nlp.time.HeidelTimeAnnotator;
+import edu.stanford.nlp.time.GUTimeAnnotator;
 import edu.stanford.nlp.util.CoreMap;
-
+import caevo.util.CaevoProperties;
 
 /**
  * This is just a wrapper around Stanford's SUTime tagger.
@@ -264,8 +267,24 @@ public class TimexClassifier {
       pipeline.addAnnotator(new WordsToSentencesAnnotator(false));
     }
     pipeline.addAnnotator(new POSTaggerAnnotator(false));
-    pipeline.addAnnotator(new TimeAnnotator("sutime", props));
-
+    try{
+        String timetype = CaevoProperties.getString("TimeType", "sutime");
+        if( timetype.equals("sutime") ){
+            pipeline.addAnnotator(new TimeAnnotator("sutime", props));
+        }
+        else if( timetype.equals("heideltime") ){
+            System.out.println("Using heideltime to annotate");
+            String heideltime_path = CaevoProperties.getString("heideltime.path");
+            props.setProperty("heideltime.path", heideltime_path);
+            pipeline.addAnnotator(new HeidelTimeAnnotator("heideltime", props));
+        }
+        else if( timetype.equals("gutime") ){
+            System.out.println("Using gutime to annotate!");
+            String gutime_path = CaevoProperties.getString("gutime.path");
+            props.setProperty("gutime.path", gutime_path);
+            pipeline.addAnnotator(new GUTimeAnnotator("gutime", props));
+        }
+    } catch (IOException e) { e.printStackTrace(); }
     return pipeline;
   }
   

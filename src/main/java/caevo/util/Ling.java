@@ -23,6 +23,7 @@ import edu.stanford.nlp.process.PTBTokenizer;
 import edu.stanford.nlp.process.PTBTokenizer.PTBTokenizerFactory;
 import edu.stanford.nlp.process.Tokenizer;
 import edu.stanford.nlp.process.TokenizerFactory;
+import edu.stanford.nlp.trees.Labeled;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TypedDependency;
 
@@ -213,7 +214,7 @@ public class Ling {
     Map<Integer, String> particles = new HashMap<Integer, String>();
     for( TypedDependency dep : deps ) {
       if( dep.reln().toString().equals("prt") ) {
-        particles.put(dep.gov().index(), dep.dep().label().value());
+        particles.put(dep.gov().index(), ((Labeled) dep.dep()).label().value());
       }
     }
     return particles;

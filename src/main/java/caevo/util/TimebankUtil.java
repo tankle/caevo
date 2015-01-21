@@ -27,6 +27,7 @@ import caevo.tlink.EventEventLink;
 import caevo.tlink.EventTimeLink;
 import caevo.tlink.TLink;
 import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.IndexedWord;
 import edu.stanford.nlp.trees.TreeGraphNode;
 import edu.stanford.nlp.trees.TypedDependency;
 
@@ -254,9 +255,9 @@ public class TimebankUtil {
   public static TextEvent.Tense pseudoTense(SieveSentence sent, List<TypedDependency> tds, TextEvent event) {
   	int eventIndex = event.getIndex();
   	for (TypedDependency td : tds) {
-  		TreeGraphNode dep = td.dep();
+  		IndexedWord dep = td.dep();
   		if (eventIndex == td.gov().index() && 
-  				isModalWord(dep.toString("value").toLowerCase()) &&
+  				isModalWord(dep.toString(CoreLabel.OutputFormat.VALUE).toLowerCase()) &&
   				td.reln().toString().equals("aux")) {
   			return TextEvent.Tense.FUTURE;
   		}

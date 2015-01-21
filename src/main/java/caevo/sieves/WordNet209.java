@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.didion.jwnl.data.POS;
 import caevo.Main;
 import caevo.SieveDocument;
 import caevo.SieveDocuments;
@@ -16,7 +17,6 @@ import caevo.tlink.TLink;
 import caevo.tlink.TimeTimeLink;
 import caevo.util.CaevoProperties;
 import caevo.util.TreeOperator;
-import net.didion.jwnl.data.POS;
 import edu.stanford.nlp.trees.LabeledScoredTreeFactory;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeFactory;

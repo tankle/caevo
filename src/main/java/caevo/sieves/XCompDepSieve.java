@@ -13,6 +13,7 @@ import caevo.tlink.TLink;
 import caevo.util.CaevoProperties;
 import caevo.util.TimebankUtil;
 import caevo.util.TreeOperator;
+import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TypedDependency;
 
@@ -210,7 +211,7 @@ public class XCompDepSieve implements Sieve {
 	 else if (eDepTense == TextEvent.Tense.NONE && eDepAspect == TextEvent.Aspect.NONE) {
 		 for (TypedDependency td : deps) {
 			 if (td.gov().index() == eDep.getIndex() && td.reln().toString().toLowerCase().equals("det")) {
-				 if (td.dep().toString("value").toLowerCase().equals("a")) {
+				 if (td.dep().toString(CoreLabel.OutputFormat.VALUE).toLowerCase().equals("a")) {
 					 return new EventEventLink(eGov.getEiid(), eDep.getEiid(), TLink.Type.BEFORE);
 				 }
 //				 if (td.dep().toString("value").toLowerCase().equals("the")) { // how can we differentiate between AFTER and IS_INCLUDED? 
@@ -236,7 +237,7 @@ public class XCompDepSieve implements Sieve {
 			String rel = td.reln().toString();
 			if (td.gov().index() == eDep.getIndex()) {
 				if ( rel.equals("mark") ) { // sometimes advmod plays role of mark
-					mark = td.dep().toString("value");
+					mark = td.dep().toString(CoreLabel.OutputFormat.VALUE);
 					if( debug ) System.out.printf("\ngov:%s dep:%s mark:%s\n%s\n", eGov.getString(), eDep.getString(), mark, sent.sentence());
 				 }
 			  }
@@ -246,7 +247,7 @@ public class XCompDepSieve implements Sieve {
 					String rel = td.reln().toString();
 					if (td.gov().index() == eDep.getIndex()) {
 						if ( rel.equals("advmod") ) { // sometimes advmod plays role of mark
-							mark = td.dep().toString("value");
+							mark = td.dep().toString(CoreLabel.OutputFormat.VALUE);
 							if( debug ) System.out.printf("\ngov:%s dep:%s mark:%s\n%s\n", eGov.getString(), eDep.getString(), mark, sent.sentence());
 					 }
 					}

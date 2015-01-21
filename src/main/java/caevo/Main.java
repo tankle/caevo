@@ -15,10 +15,10 @@ import java.util.Set;
 import caevo.sieves.Sieve;
 import caevo.tlink.TLink;
 import caevo.tlink.TimeTimeLink;
+import caevo.util.CaevoProperties;
 import caevo.util.Directory;
 import caevo.util.Ling;
 import caevo.util.SieveStats;
-import caevo.util.CaevoProperties;
 import caevo.util.Util;
 import caevo.util.WordNet;
 import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
@@ -754,8 +754,10 @@ public class Main {
 	/**
 	 * Main. Multiple run modes. See comments on the top of this class definition.
 	 */
-	public static void main(String[] args) {
-        //		Properties props = StringUtils.argsToProperties(args);
+	public static void main(String[] args) {		
+
+   //		Properties props = StringUtils.argsToProperties(args);
+		
 		Main main = new Main(args);
 		
 		// Test each sieve's precision independently.

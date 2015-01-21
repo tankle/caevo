@@ -10,8 +10,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import edu.stanford.nlp.ling.CoreAnnotations.CopyAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.LabelIDAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.IndexedWord;
 import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.ling.Word;
 import edu.stanford.nlp.trees.GrammaticalRelation;
@@ -552,7 +553,7 @@ public class TreeOperator {
         copies++;
         end--;
       }
-      if( copies > 0 ) gov.label().set(CopyAnnotation.class, copies);
+      if( copies > 0 ) gov.label().set(LabelIDAnnotation .class, copies);
       gov.label().setIndex(Integer.parseInt(strGov.substring(hyphen+1,end)));
 
       // "sad-3"
@@ -567,10 +568,11 @@ public class TreeOperator {
         copies++;
         end--;
       }
-      if( copies > 0 ) dep.label().set(CopyAnnotation.class, copies);
+      if( copies > 0 ) dep.label().set(LabelIDAnnotation .class, copies);
       dep.label().setIndex(Integer.parseInt(strDep.substring(hyphen+1,end)));
 
-      return new TypedDependency(rel,gov,dep);
+//      return new TypedDependency(rel,gov,dep);
+      return new TypedDependency(rel,new IndexedWord(gov.label()),new IndexedWord(dep.label()));
     } catch( Exception ex ) {
       System.out.println("createDependency() error with input: " + strReln + " " + strGov + " " + strDep);
       ex.printStackTrace();

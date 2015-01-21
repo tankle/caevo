@@ -10,6 +10,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import net.didion.jwnl.data.POS;
+import net.didion.jwnl.data.Synset;
 import caevo.Main;
 import caevo.SieveDocument;
 import caevo.SieveDocuments;
@@ -20,8 +22,6 @@ import caevo.util.HandleParameters;
 import caevo.util.TimebankUtil;
 import caevo.util.TreeOperator;
 import caevo.util.WordNet;
-import net.didion.jwnl.data.POS;
-import net.didion.jwnl.data.Synset;
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.stats.Counter;
 import edu.stanford.nlp.trees.LabeledScoredTreeFactory;

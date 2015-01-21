@@ -1,25 +1,26 @@
 package caevo;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.IOException;
 import java.util.Properties;
 
+import caevo.util.CaevoProperties;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.AnnotationPipeline;
 import edu.stanford.nlp.pipeline.POSTaggerAnnotator;
-import edu.stanford.nlp.pipeline.PTBTokenizerAnnotator;
+import edu.stanford.nlp.pipeline.TokenizerAnnotator;
 import edu.stanford.nlp.pipeline.WordsToSentencesAnnotator;
+import edu.stanford.nlp.time.GUTimeAnnotator;
+import edu.stanford.nlp.time.HeidelTimeAnnotator;
 import edu.stanford.nlp.time.Options.RelativeHeuristicLevel;
 import edu.stanford.nlp.time.SUTimeMain;
 import edu.stanford.nlp.time.TimeAnnotations;
 import edu.stanford.nlp.time.TimeAnnotator;
-import edu.stanford.nlp.time.HeidelTimeAnnotator;
-import edu.stanford.nlp.time.GUTimeAnnotator;
+import edu.stanford.nlp.time.XMLUtils;
 import edu.stanford.nlp.util.CoreMap;
-import caevo.util.CaevoProperties;
 
 /**
  * This is just a wrapper around Stanford's SUTime tagger.
@@ -199,31 +200,32 @@ public class TimexClassifier {
     // Extract TIMEX3 entities.
     Annotation annotation = SUTimeMain.textToAnnotation(timexPipeline, buildStringFromCoreLabels(words, 0, words.size()), docDate);
 
-/*    // Print TIMEX3 results.
-    List<CoreLabel> sutimeTokens = annotation.get(CoreAnnotations.TokensAnnotation.class);
-    System.out.println("SUTime returned # tokens = " + sutimeTokens.size());
-    if( sutimeTokens.size() != words.size() )
-      System.out.println("ERROR: SUTime changes size of our tokens: " + sutimeTokens.size() + " vs our original " + words.size());
-    for( int xx = 0; xx < words.size(); xx++ ) {
-      String orig = ((CoreLabel)words.get(xx)).value();
-      String timex = annotation.get(CoreAnnotations.TokensAnnotation.class).get(xx).value();
-      if( !orig.equalsIgnoreCase(timex) )
-        System.out.println("mismatch tokens: " + orig + " vs " + timex);
-    }
-    for( CoreMap label : annotation.get(TimeAnnotations.TimexAnnotations.class) ) {
-      for( Class theclass : label.keySet() ) System.out.println("-->class=" + theclass);
-      System.out.println("begin = " + label.get(CoreAnnotations.TokenBeginAnnotation.class));
-      System.out.println("end   = " + label.get(CoreAnnotations.TokenEndAnnotation.class));
-      System.out.println("--TIMEX-->" + label);      
-      edu.stanford.nlp.time.Timex stanfordTimex = label.get(TimeAnnotations.TimexAnnotation.class);
-      System.out.println("\ttimex = " + stanfordTimex);
-      System.out.println("\txml   = " + stanfordTimex.toXmlElement());
-      System.out.println("\txml value = " + stanfordTimex.toXmlElement().getAttribute("value"));
-    }
-    Document xmlDoc = SUTimeMain.annotationToXmlDocument(annotation);
-    System.out.println("TIMEXED!"); System.out.println(XMLUtils.documentToString(xmlDoc));
-*/
+    // Print TIMEX3 results.
+//    List<CoreLabel> sutimeTokens = annotation.get(CoreAnnotations.TokensAnnotation.class);
+//    System.out.println("SUTime returned # tokens = " + sutimeTokens.size());
+//    if( sutimeTokens.size() != words.size() )
+//      System.out.println("ERROR: SUTime changes size of our tokens: " + sutimeTokens.size() + " vs our original " + words.size());
+//    for( int xx = 0; xx < words.size(); xx++ ) {
+//      String orig = ((CoreLabel)words.get(xx)).value();
+//      String timex = annotation.get(CoreAnnotations.TokensAnnotation.class).get(xx).value();
+//      if( !orig.equalsIgnoreCase(timex) )
+//        System.out.println("mismatch tokens: " + orig + " vs " + timex);
+//    }
+//    for( CoreMap label : annotation.get(TimeAnnotations.TimexAnnotations.class) ) {
+//      for( Class theclass : label.keySet() ) System.out.println("-->class=" + theclass);
+//      System.out.println("begin = " + label.get(CoreAnnotations.TokenBeginAnnotation.class));
+//      System.out.println("end   = " + label.get(CoreAnnotations.TokenEndAnnotation.class));
+//      System.out.println("--TIMEX-->" + label);      
+//      edu.stanford.nlp.time.Timex stanfordTimex = label.get(TimeAnnotations.TimexAnnotation.class);
+//      System.out.println("\ttimex = " + stanfordTimex);
+//      System.out.println("\txml   = " + stanfordTimex.toXmlElement());
+//      System.out.println("\txml value = " + stanfordTimex.toXmlElement().getAttribute("value"));
+//    }
+//    org.w3c.dom.Document xmlDoc = SUTimeMain.annotationToXmlDocument(annotation);
+//    System.out.println("TIMEXED!"); System.out.println(XMLUtils.documentToString(xmlDoc));
+
     
+    int starti = 0;
     // Create my Timex objects from Stanford's Timex objects.
     List<Timex> newtimexes = new ArrayList<Timex>();
     for( CoreMap label : annotation.get(TimeAnnotations.TimexAnnotations.class) ) {
@@ -237,8 +239,29 @@ public class TimexClassifier {
       String docFnStr = stanfordElement.getAttribute("functionInDocument");
       if (docFnStr != null && !docFnStr.isEmpty())
       	newtimex.setDocumentFunction(Timex.DocumentFunction.valueOf(docFnStr));
-      // Stanford Timex starts at index 0 in the sentence, not index 1.
-      newtimex.setSpan(label.get(CoreAnnotations.TokenBeginAnnotation.class)+1, label.get(CoreAnnotations.TokenEndAnnotation.class)+1);
+//      int off = label.get(CoreAnnotations.CharacterOffsetBeginAnnotation.class) + 1;
+      int offset = 0, end = 0;
+      if( !label.containsKey(CoreAnnotations.TokenBeginAnnotation.class)){
+      	String text = label.get(CoreAnnotations.TextAnnotation.class);
+      	String[] tokens = text.split(" ");
+      	for(int i=starti; i<words.size(); i++){
+      		String orig = ((CoreLabel)words.get(i)).value();
+      		if(orig.equals(tokens[0])){
+      			offset = i + 1;
+      			end = offset + tokens.length;
+      			starti = end;
+      			break;
+      		}
+      	}
+      	
+      }
+      else{
+      	 // Stanford Timex starts at index 0 in the sentence, not index 1.
+      	offset = label.get(CoreAnnotations.TokenBeginAnnotation.class)+ 1;
+      	end = label.get(CoreAnnotations.TokenEndAnnotation.class) + 1;
+      }
+     
+      newtimex.setSpan(offset, end);
       if( debug ) System.out.println("NEW SUTIME TIMEX: " + newtimex);
       newtimexes.add(newtimex);
     }
@@ -263,7 +286,8 @@ public class TimexClassifier {
     
     AnnotationPipeline pipeline = new AnnotationPipeline();
     if (tokenize) {
-      pipeline.addAnnotator(new PTBTokenizerAnnotator(false));
+//      pipeline.addAnnotator(new PTBTokenizerAnnotator(false));
+    	pipeline.addAnnotator(new TokenizerAnnotator(false));
       pipeline.addAnnotator(new WordsToSentencesAnnotator(false));
     }
     pipeline.addAnnotator(new POSTaggerAnnotator(false));

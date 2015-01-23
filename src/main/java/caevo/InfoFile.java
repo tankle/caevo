@@ -743,6 +743,7 @@ public class InfoFile {
     for( Sentence sent : sentences ) {
       for( TextEvent event : sent.events() ) {
         for( String eiid : event.getAllEiids() ) {
+        	//TODO pos need to been add
           strings.add("<MAKEINSTANCE eventID=\"" + event.getId() + 
               "\" eiid=\"" + eiid + 
               "\" tense=\"" + event.getTense() + 

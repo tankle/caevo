@@ -201,28 +201,30 @@ public class TimexClassifier {
     Annotation annotation = SUTimeMain.textToAnnotation(timexPipeline, buildStringFromCoreLabels(words, 0, words.size()), docDate);
 
     // Print TIMEX3 results.
-//    List<CoreLabel> sutimeTokens = annotation.get(CoreAnnotations.TokensAnnotation.class);
-//    System.out.println("SUTime returned # tokens = " + sutimeTokens.size());
-//    if( sutimeTokens.size() != words.size() )
-//      System.out.println("ERROR: SUTime changes size of our tokens: " + sutimeTokens.size() + " vs our original " + words.size());
-//    for( int xx = 0; xx < words.size(); xx++ ) {
-//      String orig = ((CoreLabel)words.get(xx)).value();
-//      String timex = annotation.get(CoreAnnotations.TokensAnnotation.class).get(xx).value();
-//      if( !orig.equalsIgnoreCase(timex) )
-//        System.out.println("mismatch tokens: " + orig + " vs " + timex);
-//    }
-//    for( CoreMap label : annotation.get(TimeAnnotations.TimexAnnotations.class) ) {
-//      for( Class theclass : label.keySet() ) System.out.println("-->class=" + theclass);
-//      System.out.println("begin = " + label.get(CoreAnnotations.TokenBeginAnnotation.class));
-//      System.out.println("end   = " + label.get(CoreAnnotations.TokenEndAnnotation.class));
-//      System.out.println("--TIMEX-->" + label);      
-//      edu.stanford.nlp.time.Timex stanfordTimex = label.get(TimeAnnotations.TimexAnnotation.class);
-//      System.out.println("\ttimex = " + stanfordTimex);
-//      System.out.println("\txml   = " + stanfordTimex.toXmlElement());
-//      System.out.println("\txml value = " + stanfordTimex.toXmlElement().getAttribute("value"));
-//    }
-//    org.w3c.dom.Document xmlDoc = SUTimeMain.annotationToXmlDocument(annotation);
-//    System.out.println("TIMEXED!"); System.out.println(XMLUtils.documentToString(xmlDoc));
+    if(debug){
+	    List<CoreLabel> sutimeTokens = annotation.get(CoreAnnotations.TokensAnnotation.class);
+	    System.out.println("SUTime returned # tokens = " + sutimeTokens.size());
+	    if( sutimeTokens.size() != words.size() )
+	      System.out.println("ERROR: SUTime changes size of our tokens: " + sutimeTokens.size() + " vs our original " + words.size());
+	    for( int xx = 0; xx < words.size(); xx++ ) {
+	      String orig = ((CoreLabel)words.get(xx)).value();
+	      String timex = annotation.get(CoreAnnotations.TokensAnnotation.class).get(xx).value();
+	      if( !orig.equalsIgnoreCase(timex) )
+	        System.out.println("mismatch tokens: " + orig + " vs " + timex);
+	    }
+	    for( CoreMap label : annotation.get(TimeAnnotations.TimexAnnotations.class) ) {
+	      for( Class<?> theclass : label.keySet() ) System.out.println("-->class=" + theclass);
+	      System.out.println("begin = " + label.get(CoreAnnotations.TokenBeginAnnotation.class));
+	      System.out.println("end   = " + label.get(CoreAnnotations.TokenEndAnnotation.class));
+	      System.out.println("--TIMEX-->" + label);      
+	      edu.stanford.nlp.time.Timex stanfordTimex = label.get(TimeAnnotations.TimexAnnotation.class);
+	      System.out.println("\ttimex = " + stanfordTimex);
+	      System.out.println("\txml   = " + stanfordTimex.toXmlElement());
+	      System.out.println("\txml value = " + stanfordTimex.toXmlElement().getAttribute("value"));
+	    }
+	    org.w3c.dom.Document xmlDoc = SUTimeMain.annotationToXmlDocument(annotation);
+	    System.out.println("TIMEXED!"); System.out.println(XMLUtils.documentToString(xmlDoc));
+    }
 
     
     int starti = 0;
@@ -249,7 +251,7 @@ public class TimexClassifier {
       		if(orig.equals(tokens[0])){
       			offset = i + 1;
       			end = offset + tokens.length;
-      			starti = end;
+      			starti = end - 1;
       			break;
       		}
       	}
@@ -260,7 +262,11 @@ public class TimexClassifier {
       	offset = label.get(CoreAnnotations.TokenBeginAnnotation.class)+ 1;
       	end = label.get(CoreAnnotations.TokenEndAnnotation.class) + 1;
       }
-     
+      System.out.println("offset is " + offset + " end at " + end);
+      //TODO because the heideltime change the source token, so we can't get the token's offset
+      // Now we just skip it.
+      if(offset ==0 && end == 0)
+      	continue;
       newtimex.setSpan(offset, end);
       if( debug ) System.out.println("NEW SUTIME TIMEX: " + newtimex);
       newtimexes.add(newtimex);
